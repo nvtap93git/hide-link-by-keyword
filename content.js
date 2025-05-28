@@ -20,6 +20,20 @@ function hideBadElements(bannedKeywords) {
             }
         }
     });
+
+    // Hide <img> tags with alt attribute containing banned keyword
+    const images = document.querySelectorAll('img[alt]');
+    images.forEach(img => {
+        const altText = normalizeText(img.getAttribute('alt') || '');
+        for (const keyword of bannedKeywords) {
+            const normalizedKeyword = normalizeText(keyword);
+            // Use includes for each word in the keyword
+            if (normalizedKeyword.split(' ').every(word => word && altText.includes(word))) {
+                img.style.display = 'none';
+                break;
+            }
+        }
+    });
 }
 
 // Fetch banned keywords from Chrome Storage
