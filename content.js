@@ -2,7 +2,7 @@ function normalizeText(text) {
     return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-function hideBadElements(bannedKeywords) {
+function hideBadElements(bannedKeywords = []) {
     // Select both <a> and <p> tags
     const elements = document.querySelectorAll('a, p');
 
@@ -34,14 +34,40 @@ function hideBadElements(bannedKeywords) {
             }
         }
     });
+
+    // Hide elements with class 'message-user' on voz.vn
+    if (window.location.hostname.includes('voz.vn')) {
+        const messageUserElements = document.querySelectorAll('.message-avatar');
+        messageUserElements.forEach(element => {
+            element.style.visibility = 'hidden';
+        });
+    }
 }
 
 // Fetch banned keywords from Chrome Storage
 function loadKeywordsAndHide() {
-    chrome.storage.local.get({ bannedKeywords: [] }, (result) => {
-        hideBadElements(result.bannedKeywords);
-    });
+    // Check if chrome.storage is available
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get({ bannedKeywords: [] }, (result) => {
+            hideBadElements(result.bannedKeywords);
+        });
+    } else {
+        // Just hide the elements with class 'message-avatar' on voz.vn without keywords
+        hideBadElements([]);
+    }
 }
 
 // Run when the page loads
 window.addEventListener('load', loadKeywordsAndHide);
+
+// Also run on DOM content loaded to catch dynamic content
+document.addEventListener('DOMContentLoaded', loadKeywordsAndHide);
+
+// Handle dynamic content by periodically checking
+const observer = new MutationObserver(() => {
+    loadKeywordsAndHide();
+});
+
+// Start observing the document with the configured parameters
+observer.observe(document.body, { childList: true, subtree: true });
+
