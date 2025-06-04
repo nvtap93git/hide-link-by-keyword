@@ -2,6 +2,34 @@ function normalizeText(text) {
     return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
+function checkAndBlockUrl() {
+    // Get current URL
+    const currentUrl = window.location.href.toLowerCase();
+
+    // Check if chrome.storage is available
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get({ blockedUrls: [], redirectUrl: '' }, (result) => {
+            const blockedUrls = result.blockedUrls || [];
+            const redirectUrl = result.redirectUrl || '';
+
+            // Check if current URL matches any blocked URL pattern
+            for (const url of blockedUrls) {
+                if (currentUrl.includes(url.toLowerCase())) {
+                    // If there's a redirect URL, go there
+                    if (redirectUrl) {
+                        window.location.replace(redirectUrl);
+                    }
+                    // Otherwise just block access to the page
+                    else {
+                        document.body.innerHTML = '<h1>This URL has been blocked</h1>';
+                    }
+                    return; // Stop after first match
+                }
+            }
+        });
+    }
+}
+
 function hideBadElements(bannedKeywords = []) {
     // Select both <a> and <p> tags
     const elements = document.querySelectorAll('a, p');
@@ -57,8 +85,16 @@ function loadKeywordsAndHide() {
     }
 }
 
+// Check for URL blocking first
+document.addEventListener('DOMContentLoaded', () => {
+    checkAndBlockUrl();
+});
+
 // Run when the page loads
-window.addEventListener('load', loadKeywordsAndHide);
+window.addEventListener('load', () => {
+    checkAndBlockUrl();
+    loadKeywordsAndHide();
+});
 
 // Also run on DOM content loaded to catch dynamic content
 document.addEventListener('DOMContentLoaded', loadKeywordsAndHide);

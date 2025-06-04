@@ -4,21 +4,25 @@
     <meta charset="UTF-8">
     <title>Manage Banned Keywords</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 10px; width: 250px; }
+        body { font-family: Arial, sans-serif; padding: 10px; width: 300px; }
         input, button { width: 100%; margin-top: 5px; }
         ul { padding: 0; list-style: none; }
-        li { margin: 5px 0; }
-        .tabs { display: flex; margin-bottom: 10px; }
+        li { margin: 5px 0; display: flex; justify-content: space-between; }
+        .tabs { display: flex; margin-bottom: 10px; flex-wrap: wrap; }
         .tab { flex: 1; padding: 5px; cursor: pointer; text-align: center; border: 1px solid #ccc; background: #eee; }
         .tab.active { background: #fff; border-bottom: none; font-weight: bold; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .delete-btn { background: #ff4d4d; color: white; border: none; cursor: pointer; margin-left: 10px; }
+        .url-entry { margin-bottom: 10px; padding: 5px; border: 1px solid #eee; }
     </style>
 </head>
 <body>
 <div class="tabs">
     <div class="tab active" id="addTab">Add Keyword</div>
     <div class="tab" id="manageTab">Manage Keywords</div>
+    <div class="tab" id="blockUrlTab">Block URL</div>
+    <div class="tab" id="manageUrlTab">Manage URLs</div>
 </div>
 <div class="tab-content active" id="addTabContent">
     <h2>Ban Keywords</h2>
@@ -28,6 +32,16 @@
 <div class="tab-content" id="manageTabContent">
     <h2>Keywords List</h2>
     <ul id="keywordsList"></ul>
+</div>
+<div class="tab-content" id="blockUrlTabContent">
+    <h2>Block URL</h2>
+    <input type="text" id="blockUrlInput" placeholder="URL to block..." />
+    <button id="addUrlBtn">Add</button>
+</div>
+<div class="tab-content" id="manageUrlTabContent">
+    <h2>Blocked URLs</h2>
+    <input type="text" id="redirectUrlInput" placeholder="Set default redirect URL..." />
+    <ul id="blockedUrlsList"></ul>
 </div>
 <script src="popup.js"></script>
 </body>
